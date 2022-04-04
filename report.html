@@ -1,0 +1,438 @@
+<!doctype html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script>
+    function plotChart(divId, chartData) {
+        // Convert from stringified html, to valid JSON
+        const chartDetails = JSON.parse(chartData.replace(/&quot;/g,'"'));
+        new Chart(document.getElementById(divId), {
+            type: chartDetails.type,
+            data: {
+                labels: chartDetails.labels,
+                datasets: chartDetails.datasets
+            },
+            options: {
+                legend: { display: chartDetails.legend },
+                title: {
+                    display: true,
+                    text: chartDetails.title
+                }
+            }
+        });
+    }
+</script>
+<html>
+<head>
+    <title>Hyperledger Caliper Report</title>
+    <meta charset="UTF-8"/>
+    <style type="text/css">
+        .left-column {
+            position: fixed;
+            width:20%;
+        }
+        .left-column ul {
+            display: block;
+            padding: 0;
+            list-style: none;
+            border-bottom: 1px solid #d9d9d9;
+            font-size: 14px;
+        }
+        .left-column h2{
+            font-size: 24px;
+            font-weight: 400;
+            margin-block-end: 0.5em;
+        }
+        .left-column h3{
+            font-size: 18px;
+            font-weight: 400;
+            margin-block-end: 0.5em;
+        }
+        .left-column li{
+            margin-left: 10px;
+            margin-bottom: 5px;
+            color: #5e6b73;
+        }
+        .right-column {
+            margin-left: 22%;
+            width:60%;
+        }
+        .right-column table {
+            font-size:11px;
+            color:#333333;
+            border-width: 1px;
+            border-color: #666666;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .right-column h2{
+            font-weight: 400;
+        }
+        .right-column h3{
+            font-weight: 400;
+        }
+        .right-column h4 {
+            font-weight: 400;
+            margin-block-end: 0;
+        }
+        .right-column th {
+            border-width: 1px;
+            font-size: small;
+            padding: 8px;
+            border-style: solid;
+            border-color: #666666;
+            background-color: #f2f2f2;
+        }
+        .right-column td {
+            border-width: 1px;
+            font-size: small;
+            padding: 8px;
+            border-style: solid;
+            border-color: #666666;
+            background-color: #ffffff;
+            font-weight: 400;
+        }
+        .tag {
+            margin-bottom: 10px;
+            padding: 5px 10px;
+        }
+        pre {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            -khtml-border-radius: 5px;
+            overflow:auto;
+            max-height:300px;
+            font-size:12px;
+        }
+        .charting {
+            display:flex;
+            flex-direction:row;
+            flex-wrap: wrap;
+            page-break-inside: auto;
+        }
+        .chart {
+            display:flex;
+            flex:1;
+            max-width: 50%;
+        }
+    </style>
+</head>
+<body style="font-family: IBM Plex Sans; font-weight: 200;">
+    <main>
+        <div class="left-column">
+            <img src="https://hyperledger.github.io/caliper/assets/img/hyperledger_caliper_logo_color.png" style="width:95%;" alt="">
+            <ul>
+                <h3>&nbspBasic information</h3>
+                <li>DLT: &nbsp<span style="font-weight: 500;">fabric</span></li>
+                <li>Name: &nbsp<span style="font-weight: 500;">token_erc721-contract-benchmark</span></li>
+                <li>Description: &nbsp<span style="font-weight: 500;">Benchmark for NFT with hyperledger Fabric</span></li>
+                <li>Benchmark Rounds: &nbsp<span style="font-weight: 500;">7</span></li>
+                <li><a href="#benchmarkInfo">Details</a></li>
+            </ul>
+            <ul>
+                <h3>&nbspBenchmark results</h3>
+                <li><a href="#benchmarksummary">Summary</a></li>
+                    <li><a href="#MintWithTokenURI">MintWithTokenURI</a></li>
+                    <li><a href="#ClientAccountBalanceMinter">ClientAccountBalanceMinter</a></li>
+                    <li><a href="#ClientAccountBalanceRecipient">ClientAccountBalanceRecipient</a></li>
+                    <li><a href="#ClientAccountIDMinter">ClientAccountIDMinter</a></li>
+                    <li><a href="#ClientAccountIDRecipient">ClientAccountIDRecipient</a></li>
+                    <li><a href="#TransferFrom">TransferFrom</a></li>
+                    <li><a href="#Burn token">Burn token</a></li>
+            </ul>
+            <ul>
+                <h3>&nbspSystem under test</h3>
+                <li><a href="#sutdetails">Details</a></li>
+            </ul>
+        </div>
+
+        <div class="right-column">
+            <h1 style="padding-top: 3em; font-weight: 500;">Caliper report</h1>
+            <div style="border-bottom: 1px solid #d9d9d9; margin-bottom: 10px;" id="benchmarksummary">
+                <table style="min-width: 100%;">
+                    <h3>Summary of performance metrics</h3>
+                    <tr>
+                         <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                    </tr>
+
+                    <tr>
+                         <td>MintWithTokenURI</td> <td>52</td> <td>0</td> <td>1.7</td> <td>2.30</td> <td>0.24</td> <td>1.56</td> <td>1.7</td>
+                    </tr>
+                    <tr>
+                         <td>ClientAccountBalanceMinter</td> <td>106</td> <td>0</td> <td>28.8</td> <td>0.24</td> <td>0.01</td> <td>0.07</td> <td>28.0</td>
+                    </tr>
+                    <tr>
+                         <td>ClientAccountBalanceRecipient</td> <td>93</td> <td>0</td> <td>25.7</td> <td>0.57</td> <td>0.01</td> <td>0.10</td> <td>25.0</td>
+                    </tr>
+                    <tr>
+                         <td>ClientAccountIDMinter</td> <td>139</td> <td>0</td> <td>30.2</td> <td>0.26</td> <td>0.01</td> <td>0.06</td> <td>29.8</td>
+                    </tr>
+                    <tr>
+                         <td>ClientAccountIDRecipient</td> <td>158</td> <td>0</td> <td>34.0</td> <td>0.23</td> <td>0.01</td> <td>0.06</td> <td>33.4</td>
+                    </tr>
+                    <tr>
+                         <td>TransferFrom</td> <td>52</td> <td>2</td> <td>1.8</td> <td>2.55</td> <td>0.30</td> <td>1.55</td> <td>1.6</td>
+                    </tr>
+                    <tr>
+                         <td>Burn token</td> <td>52</td> <td>17</td> <td>1.3</td> <td>7.61</td> <td>0.31</td> <td>2.74</td> <td>1.3</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="MintWithTokenURI">
+                <h2>Benchmark round: MintWithTokenURI</h2>
+                <p>Mint a new non-fungible token</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 30
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for MintWithTokenURI</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>MintWithTokenURI</td> <td>52</td> <td>0</td> <td>1.7</td> <td>2.30</td> <td>0.24</td> <td>1.56</td> <td>1.7</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for MintWithTokenURI</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="ClientAccountBalanceMinter">
+                <h2>Benchmark round: ClientAccountBalanceMinter</h2>
+                <p>Check account balance for minter</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 4
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for ClientAccountBalanceMinter</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>ClientAccountBalanceMinter</td> <td>106</td> <td>0</td> <td>28.8</td> <td>0.24</td> <td>0.01</td> <td>0.07</td> <td>28.0</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for ClientAccountBalanceMinter</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="ClientAccountBalanceRecipient">
+                <h2>Benchmark round: ClientAccountBalanceRecipient</h2>
+                <p>Check account balance for recipient</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 4
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for ClientAccountBalanceRecipient</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>ClientAccountBalanceRecipient</td> <td>93</td> <td>0</td> <td>25.7</td> <td>0.57</td> <td>0.01</td> <td>0.10</td> <td>25.0</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for ClientAccountBalanceRecipient</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="ClientAccountIDMinter">
+                <h2>Benchmark round: ClientAccountIDMinter</h2>
+                <p>get client account ID for minter</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 5
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for ClientAccountIDMinter</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>ClientAccountIDMinter</td> <td>139</td> <td>0</td> <td>30.2</td> <td>0.26</td> <td>0.01</td> <td>0.06</td> <td>29.8</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for ClientAccountIDMinter</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="ClientAccountIDRecipient">
+                <h2>Benchmark round: ClientAccountIDRecipient</h2>
+                <p>get client account ID for recipient</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 5
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for ClientAccountIDRecipient</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>ClientAccountIDRecipient</td> <td>158</td> <td>0</td> <td>34.0</td> <td>0.23</td> <td>0.01</td> <td>0.06</td> <td>33.4</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for ClientAccountIDRecipient</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="TransferFrom">
+                <h2>Benchmark round: TransferFrom</h2>
+                <p>Transfer from minter to recipient</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 30
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for TransferFrom</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>TransferFrom</td> <td>52</td> <td>2</td> <td>1.8</td> <td>2.55</td> <td>0.30</td> <td>1.55</td> <td>1.6</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for TransferFrom</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="Burn token">
+                <h2>Benchmark round: Burn token</h2>
+                <p>burn non-fungible token</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 50
+rateControl:
+  type: fixed-load
+  opts:
+    transactionLoad: 2
+</pre>
+                        <h3>Performance metrics for Burn token</h3>
+                            <table style="min-width: 100%;">
+                                <tr>
+                                     <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
+                                </tr>
+                                <tr>
+                                     <td>Burn token</td> <td>52</td> <td>17</td> <td>1.3</td> <td>7.61</td> <td>0.31</td> <td>2.74</td> <td>1.3</td>
+                                </tr>
+                            </table>
+                        <h3>Resource utilization for Burn token</h3>
+            </div>
+
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;">
+                <h2>Test Environment</h2>
+                <h3>benchmark config</h3>
+                <pre id="benchmarkInfo" style="overflow: visible;white-space: pre-wrap;max-height:100%;">name: token_erc721-contract-benchmark
+description: Benchmark for NFT with hyperledger Fabric
+workers:
+  type: local
+  number: 2
+rounds:
+  - label: MintWithTokenURI
+    description: Mint a new non-fungible token
+    txDuration: 30
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;MintWithTokenURI.js
+      arguments:
+        tokens: 10
+        contractId: token_erc721
+        invokerId: minter
+  - label: ClientAccountBalanceMinter
+    description: Check account balance for minter
+    txDuration: 4
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;ClientAccountBalance.js
+      arguments:
+        contractId: token_erc721
+        invokerId: minter
+  - label: ClientAccountBalanceRecipient
+    description: Check account balance for recipient
+    txDuration: 4
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;ClientAccountBalance.js
+      arguments:
+        contractId: token_erc721
+        invokerId: _Org2MSP_recipient
+  - label: ClientAccountIDMinter
+    description: get client account ID for minter
+    txDuration: 5
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;ClientAccountID.js
+      arguments:
+        contractId: token_erc721
+        invokerId: minter
+  - label: ClientAccountIDRecipient
+    description: get client account ID for recipient
+    txDuration: 5
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;ClientAccountID.js
+      arguments:
+        contractId: token_erc721
+        invokerId: _Org2MSP_recipient
+  - label: TransferFrom
+    description: Transfer from minter to recipient
+    txDuration: 30
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;TransferFrom.js
+      arguments:
+        contractId: token_erc721
+        invokerId: minter
+        minterClientID: &gt;-
+          x509::&#x2F;C&#x3D;US&#x2F;ST&#x3D;North
+          Carolina&#x2F;O&#x3D;Hyperledger&#x2F;OU&#x3D;client&#x2F;CN&#x3D;minter::&#x2F;C&#x3D;US&#x2F;ST&#x3D;North
+          Carolina&#x2F;L&#x3D;Durham&#x2F;O&#x3D;org1.example.com&#x2F;CN&#x3D;ca.org1.example.com
+        recipientClientID: &gt;-
+          x509::&#x2F;C&#x3D;US&#x2F;ST&#x3D;North
+          Carolina&#x2F;O&#x3D;Hyperledger&#x2F;OU&#x3D;client&#x2F;CN&#x3D;recipient::&#x2F;C&#x3D;UK&#x2F;ST&#x3D;Hampshire&#x2F;L&#x3D;Hursley&#x2F;O&#x3D;org2.example.com&#x2F;CN&#x3D;ca.org2.example.com
+  - label: Burn token
+    description: burn non-fungible token
+    txDuration: 50
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 2
+    workload:
+      module: workload&#x2F;Burn.js
+      arguments:
+        contractId: token_erc721
+        invokerId: _Org2MSP_recipient
+</pre>
+                <h3>SUT</h3>
+                <pre id="sutdetails">not provided</pre>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

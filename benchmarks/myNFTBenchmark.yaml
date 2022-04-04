@@ -1,0 +1,95 @@
+test:
+    name: token_erc721-contract-benchmark
+    description: Benchmark for NFT with hyperledger Fabric
+    workers:
+      type: local
+      number: 2
+    rounds:
+      - label: MintWithTokenURI
+        description: Mint a new non-fungible token
+        txDuration: 30
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/MintWithTokenURI.js
+          arguments:
+            tokens: 10
+            contractId: token_erc721
+            invokerId: minter
+      - label: ClientAccountBalanceMinter
+        description: Check account balance for minter
+        txDuration: 4
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/ClientAccountBalance.js
+          arguments:
+            contractId: token_erc721
+            invokerId: minter
+      - label: ClientAccountBalanceRecipient
+        description: Check account balance for recipient
+        txDuration: 4
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/ClientAccountBalance.js
+          arguments:
+            contractId: token_erc721
+            invokerId: _Org2MSP_recipient
+      - label: ClientAccountIDMinter
+        description: get client account ID for minter
+        txDuration: 5
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/ClientAccountID.js
+          arguments:
+            contractId: token_erc721
+            invokerId: minter
+      - label: ClientAccountIDRecipient
+        description: get client account ID for recipient
+        txDuration: 5
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/ClientAccountID.js
+          arguments:
+            contractId: token_erc721
+            invokerId: _Org2MSP_recipient
+      - label: TransferFrom
+        description: Transfer from minter to recipient
+        txDuration: 30
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/TransferFrom.js
+          arguments:
+            contractId: token_erc721
+            invokerId: minter
+            minterClientID: x509::/C=US/ST=North Carolina/O=Hyperledger/OU=client/CN=minter::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com
+            recipientClientID: x509::/C=US/ST=North Carolina/O=Hyperledger/OU=client/CN=recipient::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com
+      - label: Burn token
+        description: burn non-fungible token
+        txDuration: 50
+        rateControl:
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          module: workload/Burn.js
+          arguments:
+            contractId: token_erc721
+            invokerId: _Org2MSP_recipient
+ 
